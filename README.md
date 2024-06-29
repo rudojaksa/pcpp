@@ -254,7 +254,7 @@ BIN := xyz
 DEP := $(shell pcpp -lp $(BIN:%=%.pl))
 ```
 
-### Dependencies
+### Dependency files
 
 The `pcpp -d target_name` can be used to generate a dependency file for
 Makefile.  Compared to the `-lp` option, the `-d` and `-dd` options also
