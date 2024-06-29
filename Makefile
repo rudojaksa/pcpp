@@ -1,5 +1,5 @@
 PACKAGE	:= pcpp
-VERSION	:= 0.5
+VERSION	:= 0.8
 AUTHOR	:= R.Jaksa 2008,2024 GPLv3
 SUBVERSION := 
 
@@ -46,10 +46,10 @@ install: $(BIN)
 endif
 
 clean:
-	rm -rf $(DEP)
+	rm -f $(DEP)
 
 mrproper: clean
-	rm -f doc $(BIN)
+	rm -rf doc $(BIN)
 
 -include $(DEP)
 -include ~/.github/Makefile.git

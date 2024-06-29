@@ -1,7 +1,7 @@
 #!/usr/bin/perl
-# pcpp generated from pcpp-0.5/pcpp.pl 2024-06-29
+# pcpp generated from pcpp-0.8/pcpp.pl 2024-06-30
 
-$SIGN = "pcpp-0.5 R.Jaksa 2008,2024 GPLv3";
+$SIGN = "pcpp-0.8 R.Jaksa 2008,2024 GPLv3";
 
 $HELP=<<EOF;
 
