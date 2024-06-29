@@ -1,3 +1,4 @@
+      - better -l output
 0.8   - raised version number to be above perlpp
       - added -d to generate Makefile dependencies lists
 0.1   - rewritten simplified preprocessor

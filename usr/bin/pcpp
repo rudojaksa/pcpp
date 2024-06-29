@@ -1,7 +1,7 @@
 #!/usr/bin/perl
-# pcpp generated from pcpp-0.8/pcpp.pl 2024-06-30
+# pcpp generated from pcpp-0.8a/pcpp.pl 2024-06-30
 
-$SIGN = "pcpp-0.8 R.Jaksa 2008,2024 GPLv3";
+$SIGN = "pcpp-0.8a R.Jaksa 2008,2024 GPLv3";
 
 $HELP=<<EOF;
 
@@ -19,7 +19,8 @@ DESCRIPTION
 OPTIONS
      -h  This help.
      -v  Verbose, CC(-vv) for more verbose.
-     -l  Just list files to include, CC(-l1/lp) for level1 or paths.
+     -l  List all files to be used, without producing actual output.
+    -ln  Plain list of files to be included, CC(-l1/lp) for level1 or paths.
     -dd  Print a list of dependencies (input file plus included ones).
  -d TGT  Generate dependencies list for Makefile for the TGT target.
  -e DIR  Exclude directory from a search, multiple -e possible.
@@ -208,6 +209,7 @@ for(@ARGV) { if($_ eq "-ni") { $NOIND=1; $_=""; last }}
 for(@ARGV) { if($_ eq "-l")  { $LIST=1; $_=""; last }}
 for(@ARGV) { if($_ eq "-l1") { $LIST=2; $_=""; last }}
 for(@ARGV) { if($_ eq "-lp") { $LIST=3; $_=""; last }}
+for(@ARGV) { if($_ eq "-ln") { $LIST=4; $_=""; last }}
 for(@ARGV) { if($_ eq "-dd") { $DEPS=1; $_=""; last }}
 
 # dependencies-list target
@@ -361,14 +363,14 @@ my sub report {
   my $l2 = $L2;			# 
      $l2-= $ll-$L1 if $ll>$L1;	# move L2 left if possible (L1 space available)
 
-  if($VERBOSE) {
+  if($VERBOSE or $LIST==1) {
     pf "$CK_$SY include $sp$c1%-*s$CD_ $CK_%*s$CD_",$l1,$file,$l2,"$how";
     pr " $c2$path$CD_" if defined $path and $path ne $file;
     pr "\n" }
   if($LIST and $c1 ne $CK_ and $how ne "missing" and $level>=1) {
     if   ($LIST==3) { print "$sp$path\n" }
     elsif($LIST==2) { print "$sp$file\n" if $level==1 }
-    else	    { print "$sp$file\n" }}}
+    elsif($LIST==4) { print "$sp$file\n" }}}
 
 # ------------------------------------------------------------------------------------- MAIN
 
@@ -483,15 +485,9 @@ push @output,addfile($_) for @FILES;
 exit if $LIST;
 
 # print deps
-if($DEPS==1) {
-  print "$DEPLIST\n";
-  exit }
+print "$DEPLIST\n" and exit if $DEPS==1;
+print "$DEPS: $DEPLIST\n" and exit if$DEPS;
 
-if($DEPS) {
-  print "$DEPS: $DEPLIST\n";
-  exit }
-
-if(1) {
 # remove tripled comments
 if(not $NOTRIPLE) {
   for my $i (0..$#output) {
@@ -511,7 +507,6 @@ for my $i (0..$#output) {
   elsif($i<$#output and $output[$i+1] =~ /^\h*$/) { $output[$i] = "$SY:DEL\n" }
   else { $output[$i] = "\n" }}
 
-}
 # :DEL tags and assembly of the final output string
 my $out;
 for my $i (0..$#output) {

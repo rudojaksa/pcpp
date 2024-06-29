@@ -16,5 +16,5 @@ but they are flattened to a single level direct includes.
     -ni  Don't return back #include statements.
 
 ### VERSION
-pcpp-0.8 R.Jaksa 2008,2024 GPLv3
+pcpp-0.8a R.Jaksa 2008,2024 GPLv3
 

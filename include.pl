@@ -18,14 +18,14 @@ my sub report {
   my $l2 = $L2;			# 
      $l2-= $ll-$L1 if $ll>$L1;	# move L2 left if possible (L1 space available)
 
-  if($VERBOSE) {
+  if($VERBOSE or $LIST==1) {
     pf "$CK_$SY include $sp$c1%-*s$CD_ $CK_%*s$CD_",$l1,$file,$l2,"$how";
     pr " $c2$path$CD_" if defined $path and $path ne $file;
     pr "\n" }
   if($LIST and $c1 ne $CK_ and $how ne "missing" and $level>=1) {
     if   ($LIST==3) { print "$sp$path\n" }
     elsif($LIST==2) { print "$sp$file\n" if $level==1 }
-    else	    { print "$sp$file\n" }}}
+    elsif($LIST==4) { print "$sp$file\n" }}}
 
 # ------------------------------------------------------------------------------------- MAIN
 

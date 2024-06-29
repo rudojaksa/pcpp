@@ -12,7 +12,8 @@ Simple Perl/Python/C/C++ preprocessor for in-comment directives.
 ### OPTIONS
         -h  This help.
         -v  Verbose, -vv for more verbose.
-        -l  Just list files to include, -l1/lp for level1 or paths.
+        -l  List all files to be used, without producing actual output.
+       -ln  Plain list of files to be included, -l1/lp for level1 or paths.
        -dd  Print a list of dependencies (input file plus included ones).
     -d TGT  Generate dependencies list for Makefile for the TGT target.
     -e DIR  Exclude directory from a search, multiple -e possible.
@@ -57,5 +58,5 @@ Simple Perl/Python/C/C++ preprocessor for in-comment directives.
        pcpp -d pcpp pcpp.pl > .pcpp.d
 
 ### VERSION
-pcpp-0.8 R.Jaksa 2008,2024 GPLv3
+pcpp-0.8a R.Jaksa 2008,2024 GPLv3
 

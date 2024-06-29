@@ -14,7 +14,8 @@ DESCRIPTION
 OPTIONS
      -h  This help.
      -v  Verbose, CC(-vv) for more verbose.
-     -l  Just list files to include, CC(-l1/lp) for level1 or paths.
+     -l  List all files to be used, without producing actual output.
+    -ln  Plain list of files to be included, CC(-l1/lp) for level1 or paths.
     -dd  Print a list of dependencies (input file plus included ones).
  -d TGT  Generate dependencies list for Makefile for the TGT target.
  -e DIR  Exclude directory from a search, multiple -e possible.
@@ -75,6 +76,7 @@ for(@ARGV) { if($_ eq "-ni") { $NOIND=1; $_=""; last }}
 for(@ARGV) { if($_ eq "-l")  { $LIST=1; $_=""; last }}
 for(@ARGV) { if($_ eq "-l1") { $LIST=2; $_=""; last }}
 for(@ARGV) { if($_ eq "-lp") { $LIST=3; $_=""; last }}
+for(@ARGV) { if($_ eq "-ln") { $LIST=4; $_=""; last }}
 for(@ARGV) { if($_ eq "-dd") { $DEPS=1; $_=""; last }}
 
 # dependencies-list target
@@ -141,15 +143,9 @@ push @output,addfile($_) for @FILES;
 exit if $LIST;
 
 # print deps
-if($DEPS==1) {
-  print "$DEPLIST\n";
-  exit }
+print "$DEPLIST\n" and exit if $DEPS==1;
+print "$DEPS: $DEPLIST\n" and exit if$DEPS;
 
-if($DEPS) {
-  print "$DEPS: $DEPLIST\n";
-  exit }
-
-if(1) {
 # remove tripled comments
 if(not $NOTRIPLE) {
   for my $i (0..$#output) {
@@ -169,7 +165,6 @@ for my $i (0..$#output) {
   elsif($i<$#output and $output[$i+1] =~ /^\h*$/) { $output[$i] = "$SY:DEL\n" }
   else { $output[$i] = "\n" }}
 
-}
 # :DEL tags and assembly of the final output string
 my $out;
 for my $i (0..$#output) {

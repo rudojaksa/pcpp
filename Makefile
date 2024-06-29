@@ -1,7 +1,7 @@
 PACKAGE	:= pcpp
 VERSION	:= 0.8
 AUTHOR	:= R.Jaksa 2008,2024 GPLv3
-SUBVERSION := 
+SUBVERSION := a
 
 SHELL	:= /bin/bash
 PATH	:= usr/bin:$(PATH)
@@ -13,7 +13,6 @@ DATE	:= $(shell date '+%Y-%m-%d')
 BIN	:= pcpp uninclude
 DEP	:= $(BIN:%=.%.d)
 DOC	:= $(BIN:%=doc/%.md)
-#BDEP	:= $(shell usr/bin/pcpp -lp $(BIN:%=%.pl))
 
 all: $(BIN) $(DOC)
 
