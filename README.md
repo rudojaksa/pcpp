@@ -53,7 +53,8 @@ the extra step `pcpp abc.in.pl`.  But the following step `perl abc.pl` becomes
 actually simpler:
 
  * now the abc\.pl doesn't require the dependent .pl files to be installed,
- * the abc\.pl stays a interpreted language code which can be fixed if needed (comments stay in as well).
+ * the abc\.pl stays a interpreted language code which can be fixed if needed
+   (comments stay in as well).
 
 The same holds for Python.  Pcpp-ing is some kind of simple code amalgamation,
 or a "static linker" for Perl/Python.  In C/C++ the pcpp is useful if you want
@@ -66,7 +67,8 @@ cannot be skewed at the use-time, run-time.
 ### In-comment directives
 
 Hidding the pcpp directives in comments allows to avoid conflicts with the main
-language interpreter/compiler/preprocessor, with IDEs or editing modes.  Further, this increases the number of comments ;-)
+language interpreter/compiler/preprocessor, with IDEs or editing modes.
+Further, this increases the number of comments ;-)
 
 Multiple filenames in the single include directive line are allowed, quoting is
 optional, whitespace between the hash and the "include" word is optional:
@@ -250,6 +252,27 @@ included)
 ``` makefile
 BIN := xyz
 DEP := $(shell pcpp -lp $(BIN:%=%.pl))
+```
+
+### Dependencies
+
+The `pcpp -d target_name` can be used to generate a dependency file for
+Makefile.  Compared to the `-lp` option, the `-d` and `-dd` options also
+include the input file into the list.  The `pcpp -lp input | xargs` will list
+only included files.  The usage in the Makefile is:
+
+``` makefile
+# require rebuild of the dependencies file .abc.d when processing abc.pl
+%: %.pl .%.d
+	echo -e '#!/usr/bin/perl' > $@
+	pcpp -v $< >> $@
+
+# save dependencies into .abc.d for the abc.pl source of the abc target
+.%.d: %.pl
+	pcpp -d $(<:%.pl=%) $< > $@
+
+# include generated dependencies but don't fail if they are missing
+-include .abc.d
 ```
 
 ### See also

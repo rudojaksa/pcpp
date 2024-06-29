@@ -1,0 +1,24 @@
+0.8   - raised version number to be above perlpp
+      - added -d to generate Makefile dependencies lists
+0.1   - rewritten simplified preprocessor
+
+perlpp
+
+0.7   - dosomething-if now working also inside {}
+      - syntax change: in {} act.comments they should be last, not first, but before next,exit,etc.
+0.6   - don't include commented out active comments
+      - added block syntax for .pl.debug code
+      - added debug line style "dosomething if condition;"
+      - another duplicate includes bug fix
+0.5   - fixed duplicate includes bug
+      - added debug labels support
+0.4   - added #eval directive
+      - added -x overwrite switch
+0.3   - simplified and renamed to perlpp
+
+perlkit
+
+0.2   - added make list
+      - added more advanced perlpp (instead of plpp.pl)
+      - improved make install
+0.1   - the start

@@ -15,6 +15,8 @@ OPTIONS
      -h  This help.
      -v  Verbose, CC(-vv) for more verbose.
      -l  Just list files to include, CC(-l1/lp) for level1 or paths.
+    -dd  Print a list of dependencies (input file plus included ones).
+ -d TGT  Generate dependencies list for Makefile for the TGT target.
  -e DIR  Exclude directory from a search, multiple -e possible.
     -nt  No triple comments removal.
     -nw  No watermarking of included parts (by #included).
@@ -52,6 +54,10 @@ TRIPLE COMMENTS
     CW(/// this line will be removed from the C/C++ code by pcpp)
     CW(#### but this will be kept)
 
+EXAMPLES
+    CW(pcpp -v pcpp.pl > pcpp)
+    CW(pcpp -d pcpp pcpp.pl > .pcpp.d)
+
 VERSION
     $SIGN
 
@@ -69,6 +75,13 @@ for(@ARGV) { if($_ eq "-ni") { $NOIND=1; $_=""; last }}
 for(@ARGV) { if($_ eq "-l")  { $LIST=1; $_=""; last }}
 for(@ARGV) { if($_ eq "-l1") { $LIST=2; $_=""; last }}
 for(@ARGV) { if($_ eq "-lp") { $LIST=3; $_=""; last }}
+for(@ARGV) { if($_ eq "-dd") { $DEPS=1; $_=""; last }}
+
+# dependencies-list target
+our $DEPS;
+for(my $i=0;$i<$#ARGV;$i++) {
+  next if $ARGV[$i] ne "-d";
+  $DEPS=$ARGV[$i+1]; $ARGV[$i]=$ARGV[$i+1]="" }
 
 # list of dirs to be excluded
 our @EXCL;
@@ -112,17 +125,29 @@ our @INCLUDED; # list of already included files (to disable double include)
 # include include.pl
 
 # auxiliary output buffer, as the include recursion would break simple print to stdout,
-# we print to the @output buffer instead and only at the end to the stdout
+# we print to the @output buffer instead, then at the end print it to the stdout
 my @output;
 
 # TODO: header with timestamp and list of inputs
 # TODO: #! interpreter identifier
+
+# for dependencies list
+our $DEPLIST;
 
 # add each argv file to the output
 push @output,addfile($_) for @FILES;
 
 # skip the rest in the list mode
 exit if $LIST;
+
+# print deps
+if($DEPS==1) {
+  print "$DEPLIST\n";
+  exit }
+
+if($DEPS) {
+  print "$DEPS: $DEPLIST\n";
+  exit }
 
 if(1) {
 # remove tripled comments

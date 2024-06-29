@@ -79,6 +79,9 @@ our sub addfile {
   elsif($ok==3) { report $CC_,beautify($path) }	# OK
   else          { report $CR_,$file }		# not found
 
+  # deps
+  $DEPLIST.=beautify($path)." " if $DEPS and $ok;
+
   return if $ok==0;				# file not found
   return if $ok==1; # file already included (TODO: accept if requested, but avoid recursion)
   push @INCLUDED,$path;				# register file

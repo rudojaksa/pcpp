@@ -1,7 +1,7 @@
 PACKAGE	:= pcpp
-VERSION	:= 0.4
+VERSION	:= 0.5
 AUTHOR	:= R.Jaksa 2008,2024 GPLv3
-SUBVERSION := b
+SUBVERSION := 
 
 SHELL	:= /bin/bash
 PATH	:= usr/bin:$(PATH)
@@ -11,12 +11,13 @@ PRJNAME := $(shell getversion -prj)
 DATE	:= $(shell date '+%Y-%m-%d')
 
 BIN	:= pcpp uninclude
+DEP	:= $(BIN:%=.%.d)
 DOC	:= $(BIN:%=doc/%.md)
-BDEP	:= $(shell pcpp -lp $(BIN:%=%.pl))
+#BDEP	:= $(shell usr/bin/pcpp -lp $(BIN:%=%.pl))
 
 all: $(BIN) $(DOC)
 
-%: %.pl $(BDEP) Makefile
+$(BIN): %: %.pl .%.d Makefile
 	echo -e '#!/usr/bin/perl' > $@
 	echo -e "# $@ generated from $(PKGNAME)/$< $(DATE)\n" >> $@
 	echo -e '$$SIGN = $(SIGN);\n' >> $@
@@ -25,7 +26,10 @@ all: $(BIN) $(DOC)
 	@sync # to ensure pcpp is saved before used in the next rule
 	@echo
 
-$(DOC): doc/%.md: %.pl Makefile | doc
+$(DEP): .%.d: %.pl
+	pcpp -d $(<:%.pl=%) $< > $@
+
+$(DOC): doc/%.md: % | doc
 	./$* -h | man2md > $@
 doc:
 	mkdir -p doc
@@ -42,9 +46,10 @@ install: $(BIN)
 endif
 
 clean:
-	rm -rf doc
+	rm -rf $(DEP)
 
 mrproper: clean
-	rm -f pcpp uninclude
+	rm -f doc $(BIN)
 
+-include $(DEP)
 -include ~/.github/Makefile.git
