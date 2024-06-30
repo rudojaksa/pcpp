@@ -41,7 +41,7 @@ handles:
 To "use" the pcpp pre-processed code it is necessary to run the pcpp first,
 like:
 
-```
+``` sh
 pcpp abc.in.pl > abc.pl
 perl abc.pl
 ```
@@ -101,7 +101,7 @@ comments without any effect:
 Included content in the pcpp output is "watermarked" by the `# included` and
 `# end` comments/directives (in C/C++ `// included` and `// end`):
 
-```
+``` perl
 # included "abc.pl"
 ...
 # end "abc.pl"
@@ -110,14 +110,14 @@ Included content in the pcpp output is "watermarked" by the `# included` and
 Indentation of the include statement is propagated into output.  For instance
 a two-spaces indentation of the hash of include statement in perl code:
 
-```
+``` perl
 some(code);
   # include abc.pl
 ```
 
 will lead to added two spaces to the original indentation in included file:
 
-```
+``` perl
 some(code);
   # included abc.pl
   originally_unindented_abc_pl(code);
@@ -213,53 +213,48 @@ which when included back will become:
 # end def.pl
 ```
 
-### Use in Makefile
+### Pcpp in Makefile
 
-Follows a Makefile rule example to create the perl executable `xyz` from its source
-`xyz.pl` and two included files.  First the #! interpreter identifier is generated,
-then any initialization content added and then pcpp is called:
+Example to make `xyz` from from its source `xyz.pl` and two included files:
 
 ``` makefile
 xyz: xyz.pl inc1.pl inc2.pl
 	echo '#!/usr/bin/perl' > $@
 	pcpp $< >> $@
 	@chmod 755 $@
-	@sync
+	@sync # to ensure the result is saved before used in the next rule
 ```
 
-The `sync` is needed only if the xyz will be used in another rule in Makefile.
-This will ensure that the pcpp output is realy saved before the use, otherwise
-it might fail randomly.  Or with the header comment and `$SIGN` variable to be
-used inside the script:
+ 1. generate #! interpreter identifier
+ 2. build `xyz` from `xyz.pl`
+ 3. make it executable
+ 4. sync the result before it is used by other makefile rule (otherwise it can be incomplete)
+
+More complex example:
 
 ``` makefile
+OUTPUT := xyz
+DEPENDENCIES := $(shell pcpp -lp $(OUTPUT:%=%.pl))
 SIGN := "$(PKGNAME) $(AUTHOR)"
 DATE := $(shell date '+%Y-%m-%d')
 
-xyz: %: %.pl $(DEPENDENCIES) Makefile
+$(OUTPUT): %: %.pl $(DEPENDENCIES) Makefile
 	echo -e '#!/usr/bin/perl' > $@
 	echo -e "# $@ generated from $(PKGNAME)/$< $(DATE)\n" >> $@
 	echo -e '$$SIGN = $(SIGN);\n' >> $@
 	pcpp $< >> $@
 	@chmod 755 $@
-	@sync # to ensure the result is saved before used in the next rule
+	@sync
 ```
 
-To obtain dependencies of pcpp-ed file, the `pcpp -lp` can be used, like in
-this example for the xyz perl script: (dependencies are a list of files to be
-included)
-
-``` makefile
-BIN := xyz
-DEP := $(shell pcpp -lp $(BIN:%=%.pl))
-```
+ * `DEPENDENCIES` are a list of files to be included obtained by `pcpp -lp`
+ * `SIGN` is a variable made available from Makefile into script
 
 ### Dependency files
 
 The `pcpp -d target_name` can be used to generate a dependency file for
-Makefile.  Compared to the `-lp` option, the `-d` and `-dd` options also
-include the input file into the list.  The `pcpp -lp input | xargs` will list
-only included files.  The usage in the Makefile is:
+Makefile.  Compared to the `-lp` option, the `-d` and `-dd` options also add
+the input file into the list.  Example Makefile:
 
 ``` makefile
 # require rebuild of the dependencies file .abc.d when processing abc.pl
@@ -277,8 +272,8 @@ only included files.  The usage in the Makefile is:
 
 ### See also
 
-&nbsp;&nbsp; [pcpp -h](doc/pcpp.md)  
-&nbsp;&nbsp; [uninclude -h](doc/uninclude.md)  
+&nbsp;&nbsp; [pcpp -h](pcpp.md)  
+&nbsp;&nbsp; [uninclude -h](uninclude.md)  
 
 ### Installation
 

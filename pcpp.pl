@@ -1,3 +1,5 @@
+# include .built.pcpp.pl .version.pl
+
 $HELP=<<EOF;
 
 NAME
@@ -60,7 +62,7 @@ EXAMPLES
     CW(pcpp -d pcpp pcpp.pl > .pcpp.d)
 
 VERSION
-    $SIGN
+    $PACKAGE-$VERSION$SUBVERSION CK($AUTHOR) CK(built $BUILT)
 
 EOF
 

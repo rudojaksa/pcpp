@@ -1,7 +1,17 @@
 #!/usr/bin/perl
-# uninclude generated from pcpp-0.8a/uninclude.pl 2024-06-30
+# uninclude generated from pcpp-0.8b/uninclude.pl 2024-06-30
 
-$SIGN = "pcpp-0.8a R.Jaksa 2008,2024 GPLv3";
+
+# included ".built.uninclude.pl"
+our $BUILT = "2024-06-30";
+# end ".built.uninclude.pl"
+
+# included ".version.pl"
+our $PACKAGE = "pcpp";
+our $VERSION = "0.8";
+our $AUTHOR = "R.Jaksa 2008,2024 GPLv3";
+our $SUBVERSION = "b";
+# end ".version.pl"
 
 $HELP=<<EOF;
 
@@ -23,7 +33,7 @@ OPTIONS
    -ni  Don't return back #include statements.
 
 VERSION
-    $SIGN
+    $PACKAGE-$VERSION$SUBVERSION CK($AUTHOR) CK(built $BUILT)
 
 EOF
 

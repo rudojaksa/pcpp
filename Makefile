@@ -1,25 +1,23 @@
 PACKAGE	:= pcpp
 VERSION	:= 0.8
 AUTHOR	:= R.Jaksa 2008,2024 GPLv3
-SUBVERSION := a
+SUBVERSION := b
 
 SHELL	:= /bin/bash
 PATH	:= usr/bin:$(PATH)
 PKGNAME	:= $(PACKAGE)-$(VERSION)$(SUBVERSION)
-SIGN	:= "$(PKGNAME) $(AUTHOR)"
-PRJNAME := $(shell getversion -prj)
+PROJECT := $(shell getversion -prj)
 DATE	:= $(shell date '+%Y-%m-%d')
 
 BIN	:= pcpp uninclude
 DEP	:= $(BIN:%=.%.d)
-DOC	:= $(BIN:%=doc/%.md)
+DOC	:= $(BIN:%=%.md)
 
 all: $(BIN) $(DOC)
 
-$(BIN): %: %.pl .%.d Makefile
+$(BIN): %: %.pl .%.d .version.pl .built.%.pl Makefile
 	echo -e '#!/usr/bin/perl' > $@
 	echo -e "# $@ generated from $(PKGNAME)/$< $(DATE)\n" >> $@
-	echo -e '$$SIGN = $(SIGN);\n' >> $@
 	usr/bin/pcpp $< >> $@
 	chmod 755 $@
 	@sync # to ensure pcpp is saved before used in the next rule
@@ -28,15 +26,26 @@ $(BIN): %: %.pl .%.d Makefile
 $(DEP): .%.d: %.pl
 	pcpp -d $(<:%.pl=%) $< > $@
 
-$(DOC): doc/%.md: % | doc
+$(DOC): %.md: %
 	./$* -h | man2md > $@
-doc:
-	mkdir -p doc
+
+.version.pl: Makefile
+	@echo 'our $$PACKAGE = "$(PACKAGE)";' > $@
+	@echo 'our $$VERSION = "$(VERSION)";' >> $@
+	@echo 'our $$AUTHOR = "$(AUTHOR)";' >> $@
+	@echo 'our $$SUBVERSION = "$(SUBVERSION)";' >> $@
+	@echo "update $@"
+
+.PRECIOUS: .built.%.pl
+.built.%.pl: %.pl .version.pl Makefile
+	@echo 'our $$BUILT = "$(DATE)";' > $@
+	@echo "update $@"
 
 # /map install
 ifneq ($(wildcard /map),)
-install: $(BIN)
-	mapinstall /box/$(PRJNAME)/$(PKGNAME) /map/$(PACKAGE) bin $(BIN)
+install: $(BIN) $(DOC) README.md
+	mapinstall -v /box/$(PROJECT)/$(PKGNAME) /map/$(PACKAGE) bin $(BIN)
+	mapinstall -v /box/$(PROJECT)/$(PKGNAME) /map/$(PACKAGE) doc $(DOC) README.md
 
 # /usr/local install
 else
@@ -44,7 +53,13 @@ install: $(BIN)
 	install $(BIN) /usr/local/bin
 endif
 
+# copy current pcpp to local usr/bin
+copy:
+	cp pcpp usr/bin
+
 clean:
+	rm -f .version.pl
+	rm -f .built.*.pl
 	rm -f $(DEP)
 
 mrproper: clean

@@ -1,3 +1,5 @@
+# include .built.uninclude.pl .version.pl
+
 $HELP=<<EOF;
 
 NAME
@@ -18,7 +20,7 @@ OPTIONS
    -ni  Don't return back #include statements.
 
 VERSION
-    $SIGN
+    $PACKAGE-$VERSION$SUBVERSION CK($AUTHOR) CK(built $BUILT)
 
 EOF
 
