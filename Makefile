@@ -1,7 +1,7 @@
 PACKAGE	:= pcpp
 VERSION	:= 0.8
 AUTHOR	:= R.Jaksa 2008,2024 GPLv3
-SUBVERSION := b
+SUBVERSION := c
 
 SHELL	:= /bin/bash
 PATH	:= usr/bin:$(PATH)
@@ -15,9 +15,9 @@ DOC	:= $(BIN:%=%.md)
 
 all: $(BIN) $(DOC)
 
-$(BIN): %: %.pl .%.d .version.pl .built.%.pl Makefile
+$(BIN): %: %.pl .%.d .version.pl .%.built.pl Makefile
 	echo -e '#!/usr/bin/perl' > $@
-	echo -e "# $@ generated from $(PKGNAME)/$< $(DATE)\n" >> $@
+	echo -e "# $@ generated from $(PKGNAME)/$< $(DATE)" >> $@
 	usr/bin/pcpp $< >> $@
 	chmod 755 $@
 	@sync # to ensure pcpp is saved before used in the next rule
@@ -36,12 +36,12 @@ $(DOC): %.md: %
 	@echo 'our $$SUBVERSION = "$(SUBVERSION)";' >> $@
 	@echo "update $@"
 
-.PRECIOUS: .built.%.pl
-.built.%.pl: %.pl .version.pl Makefile
+.PRECIOUS: .%.built.pl
+.%.built.pl: %.pl .version.pl Makefile
 	@echo 'our $$BUILT = "$(DATE)";' > $@
 	@echo "update $@"
 
-# /map install
+# /map install, requires /map directory and getversion and mapinstall tools
 ifneq ($(wildcard /map),)
 install: $(BIN) $(DOC) README.md
 	mapinstall -v /box/$(PROJECT)/$(PKGNAME) /map/$(PACKAGE) bin $(BIN)
@@ -59,11 +59,11 @@ copy:
 
 clean:
 	rm -f .version.pl
-	rm -f .built.*.pl
+	rm -f .*.built.pl
 	rm -f $(DEP)
 
 mrproper: clean
-	rm -rf doc $(BIN)
+	rm -rf $(DOC) $(BIN)
 
 -include $(DEP)
 -include ~/.github/Makefile.git

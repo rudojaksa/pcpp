@@ -1,4 +1,4 @@
-# include .built.uninclude.pl .version.pl
+# include .version.pl .uninclude.built.pl
 
 $HELP=<<EOF;
 

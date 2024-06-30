@@ -1,4 +1,4 @@
-# include .built.pcpp.pl .version.pl
+# include .version.pl .pcpp.built.pl
 
 $HELP=<<EOF;
 

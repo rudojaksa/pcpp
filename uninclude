@@ -1,17 +1,16 @@
 #!/usr/bin/perl
-# uninclude generated from pcpp-0.8b/uninclude.pl 2024-06-30
-
-
-# included ".built.uninclude.pl"
-our $BUILT = "2024-06-30";
-# end ".built.uninclude.pl"
+# uninclude generated from pcpp-0.8c/uninclude.pl 2024-06-30
 
 # included ".version.pl"
 our $PACKAGE = "pcpp";
 our $VERSION = "0.8";
 our $AUTHOR = "R.Jaksa 2008,2024 GPLv3";
-our $SUBVERSION = "b";
+our $SUBVERSION = "c";
 # end ".version.pl"
+
+# included ".uninclude.built.pl"
+our $BUILT = "2024-06-30";
+# end ".uninclude.built.pl"
 
 $HELP=<<EOF;
 

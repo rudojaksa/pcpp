@@ -1,17 +1,16 @@
 #!/usr/bin/perl
-# pcpp generated from pcpp-0.8b/pcpp.pl 2024-06-30
-
-
-# included ".built.pcpp.pl"
-our $BUILT = "2024-06-30";
-# end ".built.pcpp.pl"
+# pcpp generated from pcpp-0.8c/pcpp.pl 2024-06-30
 
 # included ".version.pl"
 our $PACKAGE = "pcpp";
 our $VERSION = "0.8";
 our $AUTHOR = "R.Jaksa 2008,2024 GPLv3";
-our $SUBVERSION = "b";
+our $SUBVERSION = "c";
 # end ".version.pl"
+
+# included ".pcpp.built.pl"
+our $BUILT = "2024-06-30";
+# end ".pcpp.built.pl"
 
 $HELP=<<EOF;
 
