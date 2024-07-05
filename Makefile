@@ -1,7 +1,7 @@
 PACKAGE	:= pcpp
-VERSION	:= 0.8
+VERSION	:= 0.9
 AUTHOR	:= R.Jaksa 2008,2024 GPLv3
-SUBVERSION := c
+SUBVERSION := 
 
 SHELL	:= /bin/bash
 PATH	:= usr/bin:$(PATH)
@@ -16,10 +16,10 @@ DOC	:= $(BIN:%=%.md)
 all: $(BIN) $(DOC)
 
 $(BIN): %: %.pl .%.d .version.pl .%.built.pl Makefile
-	echo -e '#!/usr/bin/perl' > $@
-	echo -e "# $@ generated from $(PKGNAME)/$< $(DATE)" >> $@
+	@echo -e '#!/usr/bin/perl' > $@
+	@echo -e "# $@ generated from $(PKGNAME)/$< $(DATE)" >> $@
 	usr/bin/pcpp $< >> $@
-	chmod 755 $@
+	@chmod 755 $@
 	@sync # to ensure pcpp is saved before used in the next rule
 	@echo
 
@@ -34,12 +34,12 @@ $(DOC): %.md: %
 	@echo 'our $$VERSION = "$(VERSION)";' >> $@
 	@echo 'our $$AUTHOR = "$(AUTHOR)";' >> $@
 	@echo 'our $$SUBVERSION = "$(SUBVERSION)";' >> $@
-	@echo "update $@"
+	@echo "make $@"
 
 .PRECIOUS: .%.built.pl
 .%.built.pl: %.pl .version.pl Makefile
 	@echo 'our $$BUILT = "$(DATE)";' > $@
-	@echo "update $@"
+	@echo "make $@"
 
 # /map install, requires /map directory and getversion and mapinstall tools
 ifneq ($(wildcard /map),)

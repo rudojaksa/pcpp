@@ -1,15 +1,15 @@
 #!/usr/bin/perl
-# pcpp generated from pcpp-0.8c/pcpp.pl 2024-06-30
+# pcpp generated from pcpp-0.9/pcpp.pl 2024-07-06
 
 # included ".version.pl"
 our $PACKAGE = "pcpp";
-our $VERSION = "0.8";
+our $VERSION = "0.9";
 our $AUTHOR = "R.Jaksa 2008,2024 GPLv3";
-our $SUBVERSION = "c";
+our $SUBVERSION = "";
 # end ".version.pl"
 
 # included ".pcpp.built.pl"
-our $BUILT = "2024-06-30";
+our $BUILT = "2024-07-06";
 # end ".pcpp.built.pl"
 
 $HELP=<<EOF;
@@ -433,8 +433,8 @@ our sub addfile {
   elsif($ok==3) { report $CC_,beautify($path) }	# OK
   else          { report $CR_,$file }		# not found
 
-  # deps
-  $DEPLIST.=beautify($path)." " if $DEPS and $ok;
+  # deps (show also nonexistent files, to allow to be generated)
+  $DEPLIST.=beautify($path)." " if $DEPS;
 
   return if $ok==0;				# file not found
   return if $ok==1; # file already included (TODO: accept if requested, but avoid recursion)
