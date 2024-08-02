@@ -1,15 +1,15 @@
 #!/usr/bin/perl
-# pcpp generated from pcpp-0.9/pcpp.pl 2024-07-06
+# pcpp generated from pcpp-0.9a/pcpp.pl 2024-08-02
 
 # included ".version.pl"
 our $PACKAGE = "pcpp";
 our $VERSION = "0.9";
 our $AUTHOR = "R.Jaksa 2008,2024 GPLv3";
-our $SUBVERSION = "";
+our $SUBVERSION = "a";
 # end ".version.pl"
 
 # included ".pcpp.built.pl"
-our $BUILT = "2024-07-06";
+our $BUILT = "2024-08-02";
 # end ".pcpp.built.pl"
 
 $HELP=<<EOF;
@@ -30,8 +30,8 @@ OPTIONS
      -v  Verbose, CC(-vv) for more verbose.
      -l  List all files to be used, without producing actual output.
     -ln  Plain list of files to be included, CC(-l1/lp) for level1 or paths.
-    -dd  Print a list of dependencies (input file plus included ones).
  -d TGT  Generate dependencies list for Makefile for the TGT target.
+    -dd  Print a list of dependencies (input file plus included ones).
  -e DIR  Exclude directory from a search, multiple -e possible.
     -nt  No triple comments removal.
     -nw  No watermarking of included parts (by #included).
@@ -425,7 +425,9 @@ our sub addfile {
     $how = "guess" if $ok==2 }
 
   # otherwise missing
-  if(not $ok) { $how = "missing" }
+  if(not $ok) {
+    $path = $file;				# orig name, needed for deplist
+    $how = "missing" }
 
   # verbose/list
   if   ($ok==1) { report $CK_,beautify($path) }	# double include
@@ -495,7 +497,7 @@ exit if $LIST;
 
 # print deps
 print "$DEPLIST\n" and exit if $DEPS==1;
-print "$DEPS: $DEPLIST\n" and exit if$DEPS;
+print "$DEPS: $DEPLIST\n" and exit if $DEPS;
 
 # remove tripled comments
 if(not $NOTRIPLE) {

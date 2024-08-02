@@ -18,8 +18,8 @@ OPTIONS
      -v  Verbose, CC(-vv) for more verbose.
      -l  List all files to be used, without producing actual output.
     -ln  Plain list of files to be included, CC(-l1/lp) for level1 or paths.
-    -dd  Print a list of dependencies (input file plus included ones).
  -d TGT  Generate dependencies list for Makefile for the TGT target.
+    -dd  Print a list of dependencies (input file plus included ones).
  -e DIR  Exclude directory from a search, multiple -e possible.
     -nt  No triple comments removal.
     -nw  No watermarking of included parts (by #included).
@@ -146,7 +146,7 @@ exit if $LIST;
 
 # print deps
 print "$DEPLIST\n" and exit if $DEPS==1;
-print "$DEPS: $DEPLIST\n" and exit if$DEPS;
+print "$DEPS: $DEPLIST\n" and exit if $DEPS;
 
 # remove tripled comments
 if(not $NOTRIPLE) {

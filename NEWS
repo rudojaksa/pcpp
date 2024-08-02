@@ -1,3 +1,4 @@
+      - fixed wrong subdirectory of nonexistent dependencies
 0.9   - -d shows nonexistent files too
       - better -l output
 0.8   - raised version number to be above perlpp

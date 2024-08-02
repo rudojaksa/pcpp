@@ -71,7 +71,9 @@ our sub addfile {
     $how = "guess" if $ok==2 }
 
   # otherwise missing
-  if(not $ok) { $how = "missing" }
+  if(not $ok) {
+    $path = $file;				# orig name, needed for deplist
+    $how = "missing" }
 
   # verbose/list
   if   ($ok==1) { report $CK_,beautify($path) }	# double include
