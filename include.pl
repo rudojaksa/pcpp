@@ -3,25 +3,24 @@
 # verbose printout of includes, globals: $L1, $L2, $level, $how
 my sub report {
   my $path=$_[1];
-  my $c1=$_[0];
+  my $c1=$_[0];	# filename color
      $c1=$CG_ if $c1 eq $CC_ and defined $path and $path eq $file;
-  my $c2=$c1;
+  my $c2=$c1;	# path color
      $c2=$CG_ if $c1 ne $CK_ and $c1 ne $CM_ and defined $path;
   my $sp = "  " x ($level-1);
 
-  # cell-lengths logic
-  my $sl = length($sp);		# just the L1-space length
-  my $ll = length($file)+$sl;	# whole L1 length
-  my $hl = length($how);	# whole L2 length
-  my $l1 = $L1-$sl;		# space-corrected L1 length
-     $l1-= $hl-$L2 if $hl>$L2;	# make space for L2 is L1 if needed and possible
-  my $l2 = $L2;			# 
-     $l2-= $ll-$L1 if $ll>$L1;	# move L2 left if possible (L1 space available)
-
   if($VERBOSE or $LIST==1) {
-    pf "$CK_$SY include $sp$c1%-*s$CD_ $CK_%*s$CD_",$l1,$file,$l2,"$how";
-    pr " $c2$path$CD_" if defined $path and $path ne $file;
-    pr "\n" }
+    my $p = "include";
+       $p = "   load" if $how eq "direct";
+       $p = "   skip" if $c1 eq $CK_;
+       $p = "missing" if $c1 eq $CR_;
+    my $h = $how;
+       $h = 0 if $how eq "missing" or $how eq "direct";
+    my $s = "$CK_$SY$CD_ $CK_$p$CD_ $sp$c1$file$CD_";
+       $s.= " $CK_$h$CD_" if $h;
+       $s.= " $c2$path$CD_" if defined $path and $path ne $file;
+    eprint "$s\n" }
+
   if($LIST and $c1 ne $CK_ and $how ne "missing" and $level>=1) {
     if   ($LIST==3) { print "$sp$path\n" }
     elsif($LIST==2) { print "$sp$file\n" if $level==1 }
@@ -49,12 +48,19 @@ our sub addfile {
     elsif(-f $path) { $ok=3 }
     $how = "direct" if $ok }
 
-  # look for file using explicit path relative to parent-file dir
+  # look for file using explicit path relative to the parent-file dir
   if(not $ok) {
     $path = "$rdir/$file";			# try path relative to parent
     if(inar \@INCLUDED,$path) { $ok=1 }		# already included
     elsif(-f $path) { $ok=3 }
-    $how = "relative" if $ok }
+    $how = "from $rdir" if $ok }
+
+  # look for file using explicit path relative to current working directory (in recursion)
+  if(not $ok) {
+    $path = "$file";				# try path relative to CWD
+    if(inar \@INCLUDED,$path) { $ok=1 }		# already included
+    elsif(-f $path) { $ok=3 }
+    $how = "from cwd" if $ok }
 
   # look for file recursively (by filename)
   if(not $ok) {
@@ -65,6 +71,8 @@ our sub addfile {
       $ok=1 and last if inar \@INCLUDED,$path;	# already included
       $ok=3 and last if inar $FF{$dir},$fn }	# found => proceed
     $how = "found" if $ok;
+
+    # speculative
     if($ok==3 and $fn ne $file) {		# if file contained dirname
       my $fd = quotemeta "/".dirname($file);	# directory part of the include name
       $ok=2 if not $dir =~ /$fd$/ }		# is speculative
@@ -76,7 +84,7 @@ our sub addfile {
     $how = "missing" }
 
   # verbose/list
-  if   ($ok==1) { report $CK_,beautify($path) }	# double include
+  if   ($ok==1) { report $CK_,beautify($path) }	# redundant, double include
   elsif($ok==2) { report $CM_,beautify($path) }	# speculative
   elsif($ok==3) { report $CC_,beautify($path) }	# OK
   else          { report $CR_,$file }		# not found
@@ -89,12 +97,12 @@ our sub addfile {
   push @INCLUDED,$path;				# register file
   $rdir = dirname $path if $ok;	# save for the explicit path lookup in next recursion
 
-  # filename regexes
+  # important: filename regexes
   my $IN1 = qr/^\h*\"([^\"]+)\"/;		# quoted include
   my $IN2;					# unquoted include
-     $IN2 = qr/^\h*([a-zA-Z0-9\._-]+\.pl)/ if $MODE eq "pl";
-     $IN2 = qr/^\h*([a-zA-Z0-9\._-]+\.py)/ if $MODE eq "py";
-     $IN2 = qr/^\h*([a-zA-Z0-9\._-]+\.h)/  if $MODE eq "c";
+     $IN2 = qr/^\h*([\/a-zA-Z0-9\._-]+\.pl)/ if $MODE eq "pl";
+     $IN2 = qr/^\h*([\/a-zA-Z0-9\._-]+\.py)/ if $MODE eq "py";
+     $IN2 = qr/^\h*([\/a-zA-Z0-9\._-]+\.h)/  if $MODE eq "c";
 
   my @output; # the output line-by-line
 

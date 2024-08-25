@@ -37,7 +37,7 @@ for(@ARGV) { if($_ eq "-ni") { $NOINC=1; $_=""; last }}
 for(@ARGV) { $FILE=$_ and last if $_ ne "" and -f $_ }
 
 # no input file
-if(not $FILE) { pr "No input file specified.\n"; exit(1) }
+if(not $FILE) { eprint "No input file specified.\n"; exit(1) }
 
 # ------------------------------------------------------------------------------------- MAIN
 
@@ -59,7 +59,7 @@ for my $i (0..$#body) {
     push @included,$1; $file=$1;
     my $n = lenar \@included,$1;
     my $sp = "  " x (lenar(\@included,$1)-1);
-    if($VERBOSE) { pr "${CK_}# uninclude$CD_ $sp$CC_$file$CD_\n" }
+    if($VERBOSE) { eprint "${CK_}# uninclude$CD_ $sp$CC_$file$CD_\n" }
     if($LIST) { print "$sp$file\n" }}
 
   # end of section

@@ -16,14 +16,15 @@ DESCRIPTION
 OPTIONS
      -h  This help.
      -v  Verbose, CC(-vv) for more verbose.
-     -l  List all files to be used, without producing actual output.
-    -ln  Plain list of files to be included, CC(-l1/lp) for level1 or paths.
- -d TGT  Generate dependencies list for Makefile for the TGT target.
-    -dd  Print a list of dependencies (input file plus included ones).
  -e DIR  Exclude directory from a search, multiple -e possible.
     -nt  No triple comments removal.
     -nw  No watermarking of included parts (by #included).
     -ni  No indentation propagation.
+
+     -l  List all files to be used, without producing actual output.
+    -ln  Plain list of files to be included, CC(-l1/lp) for level1 or paths.
+ -d TGT  Generate dependencies list for Makefile for the TGT target.
+    -dd  Print a list of dependencies (input file plus included ones).
 
 INCLUDE DIRECTIVE
     Only lines with the CW("include") directive are recognized.
@@ -33,10 +34,11 @@ INCLUDE DIRECTIVE
     Include files can be defined by the filename, by the path, or by
     a partial incomplete path.  The path resolving procedure is:
 
-    1. look for direct path from CWD,
+    1. look for direct path from CWD if in top-level file,
     2. look for relative path from file to which we include,
-    3. find filename recursively in the depth order from CWD,
-    4. strip directory part from include and serch by filename.
+    3. look for CWD-relative path,
+    4. find filename recursively in the depth order from CWD,
+    5. strip directory part from include and serch by filename.
     
     Double includes are avoided.  Missing includes are ignored.
     Any text after include files is a comment.
@@ -95,7 +97,7 @@ for(my $i=0;$i<$#ARGV;$i++) {
 
 # prepend "./" if needed
 for(@EXCL) { $_="./$_" if not /^\.\// and not /^\// }
-if($VERBOSE) { pr "${CK_}# exclude$CD_ $CR_$_$CD_\n" for @EXCL }
+if($VERBOSE) { eprint "${CK_}# exclude$CD_ $CR_$_$CD_\n" for @EXCL }
 
 # input files
 our @FILES; # list of files to be processed
@@ -118,9 +120,9 @@ resort();	# re-sort DIRS
 if($VERBOSE>1) {
   my $l = $L1+3;
   for my $d (@DIRS) {
-    pf "$CK_#  search $CG_%-${l}s$CD_",$d;
-    pr " $CK_$_$CD_" for @{$FF{$d}};
-    pr "\n" }}
+    eprintf "$CK_#  search $CG_%-${l}s$CD_",$d;
+    eprint " $CK_$_$CD_" for @{$FF{$d}};
+    eprint "\n" }}
 
 # ------------------------------------------------------------------------- PROCESS INCLUDES
 our @INCLUDED; # list of already included files (to disable double include)

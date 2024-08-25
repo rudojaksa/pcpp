@@ -1,15 +1,15 @@
 #!/usr/bin/perl
-# pcpp generated from pcpp-0.9a/pcpp.pl 2024-08-02
+# pcpp generated from pcpp-0.10/pcpp.pl 2024-08-13
 
 # included ".version.pl"
 our $PACKAGE = "pcpp";
-our $VERSION = "0.9";
+our $VERSION = "0.10";
 our $AUTHOR = "R.Jaksa 2008,2024 GPLv3";
-our $SUBVERSION = "a";
+our $SUBVERSION = "";
 # end ".version.pl"
 
 # included ".pcpp.built.pl"
-our $BUILT = "2024-08-02";
+our $BUILT = "2024-08-13";
 # end ".pcpp.built.pl"
 
 $HELP=<<EOF;
@@ -28,14 +28,15 @@ DESCRIPTION
 OPTIONS
      -h  This help.
      -v  Verbose, CC(-vv) for more verbose.
-     -l  List all files to be used, without producing actual output.
-    -ln  Plain list of files to be included, CC(-l1/lp) for level1 or paths.
- -d TGT  Generate dependencies list for Makefile for the TGT target.
-    -dd  Print a list of dependencies (input file plus included ones).
  -e DIR  Exclude directory from a search, multiple -e possible.
     -nt  No triple comments removal.
     -nw  No watermarking of included parts (by #included).
     -ni  No indentation propagation.
+
+     -l  List all files to be used, without producing actual output.
+    -ln  Plain list of files to be included, CC(-l1/lp) for level1 or paths.
+ -d TGT  Generate dependencies list for Makefile for the TGT target.
+    -dd  Print a list of dependencies (input file plus included ones).
 
 INCLUDE DIRECTIVE
     Only lines with the CW("include") directive are recognized.
@@ -45,10 +46,11 @@ INCLUDE DIRECTIVE
     Include files can be defined by the filename, by the path, or by
     a partial incomplete path.  The path resolving procedure is:
 
-    1. look for direct path from CWD,
+    1. look for direct path from CWD if in top-level file,
     2. look for relative path from file to which we include,
-    3. find filename recursively in the depth order from CWD,
-    4. strip directory part from include and serch by filename.
+    3. look for CWD-relative path,
+    4. find filename recursively in the depth order from CWD,
+    5. strip directory part from include and serch by filename.
     
     Double includes are avoided.  Missing includes are ignored.
     Any text after include files is a comment.
@@ -127,8 +129,9 @@ sub lenar { my $i=0; for(@{$_[0]}) { $i++ if $_ ne "" } return $i }
 # end "inar.pl"
 
 # included "print.pl"
-sub pr { print  STDERR @_ }
-sub pf { printf STDERR @_ }
+# stderr prints, 'e' for error, allows the "grep print" to find it
+sub eprint  { print  STDERR @_ }
+sub eprintf { printf STDERR @_ }
 # end "print.pl"
 
 # included "helpman.pl"
@@ -235,7 +238,7 @@ for(my $i=0;$i<$#ARGV;$i++) {
 
 # prepend "./" if needed
 for(@EXCL) { $_="./$_" if not /^\.\// and not /^\// }
-if($VERBOSE) { pr "${CK_}# exclude$CD_ $CR_$_$CD_\n" for @EXCL }
+if($VERBOSE) { eprint "${CK_}# exclude$CD_ $CR_$_$CD_\n" for @EXCL }
 
 # input files
 our @FILES; # list of files to be processed
@@ -343,9 +346,9 @@ resort();	# re-sort DIRS
 if($VERBOSE>1) {
   my $l = $L1+3;
   for my $d (@DIRS) {
-    pf "$CK_#  search $CG_%-${l}s$CD_",$d;
-    pr " $CK_$_$CD_" for @{$FF{$d}};
-    pr "\n" }}
+    eprintf "$CK_#  search $CG_%-${l}s$CD_",$d;
+    eprint " $CK_$_$CD_" for @{$FF{$d}};
+    eprint "\n" }}
 
 # ------------------------------------------------------------------------- PROCESS INCLUDES
 our @INCLUDED; # list of already included files (to disable double include)
@@ -357,25 +360,24 @@ our @INCLUDED; # list of already included files (to disable double include)
 # verbose printout of includes, globals: $L1, $L2, $level, $how
 my sub report {
   my $path=$_[1];
-  my $c1=$_[0];
+  my $c1=$_[0];	# filename color
      $c1=$CG_ if $c1 eq $CC_ and defined $path and $path eq $file;
-  my $c2=$c1;
+  my $c2=$c1;	# path color
      $c2=$CG_ if $c1 ne $CK_ and $c1 ne $CM_ and defined $path;
   my $sp = "  " x ($level-1);
 
-  # cell-lengths logic
-  my $sl = length($sp);		# just the L1-space length
-  my $ll = length($file)+$sl;	# whole L1 length
-  my $hl = length($how);	# whole L2 length
-  my $l1 = $L1-$sl;		# space-corrected L1 length
-     $l1-= $hl-$L2 if $hl>$L2;	# make space for L2 is L1 if needed and possible
-  my $l2 = $L2;			# 
-     $l2-= $ll-$L1 if $ll>$L1;	# move L2 left if possible (L1 space available)
-
   if($VERBOSE or $LIST==1) {
-    pf "$CK_$SY include $sp$c1%-*s$CD_ $CK_%*s$CD_",$l1,$file,$l2,"$how";
-    pr " $c2$path$CD_" if defined $path and $path ne $file;
-    pr "\n" }
+    my $p = "include";
+       $p = "   load" if $how eq "direct";
+       $p = "   skip" if $c1 eq $CK_;
+       $p = "missing" if $c1 eq $CR_;
+    my $h = $how;
+       $h = 0 if $how eq "missing" or $how eq "direct";
+    my $s = "$CK_$SY$CD_ $CK_$p$CD_ $sp$c1$file$CD_";
+       $s.= " $CK_$h$CD_" if $h;
+       $s.= " $c2$path$CD_" if defined $path and $path ne $file;
+    eprint "$s\n" }
+
   if($LIST and $c1 ne $CK_ and $how ne "missing" and $level>=1) {
     if   ($LIST==3) { print "$sp$path\n" }
     elsif($LIST==2) { print "$sp$file\n" if $level==1 }
@@ -403,12 +405,19 @@ our sub addfile {
     elsif(-f $path) { $ok=3 }
     $how = "direct" if $ok }
 
-  # look for file using explicit path relative to parent-file dir
+  # look for file using explicit path relative to the parent-file dir
   if(not $ok) {
     $path = "$rdir/$file";			# try path relative to parent
     if(inar \@INCLUDED,$path) { $ok=1 }		# already included
     elsif(-f $path) { $ok=3 }
-    $how = "relative" if $ok }
+    $how = "from $rdir" if $ok }
+
+  # look for file using explicit path relative to current working directory (in recursion)
+  if(not $ok) {
+    $path = "$file";				# try path relative to CWD
+    if(inar \@INCLUDED,$path) { $ok=1 }		# already included
+    elsif(-f $path) { $ok=3 }
+    $how = "from cwd" if $ok }
 
   # look for file recursively (by filename)
   if(not $ok) {
@@ -419,6 +428,8 @@ our sub addfile {
       $ok=1 and last if inar \@INCLUDED,$path;	# already included
       $ok=3 and last if inar $FF{$dir},$fn }	# found => proceed
     $how = "found" if $ok;
+
+    # speculative
     if($ok==3 and $fn ne $file) {		# if file contained dirname
       my $fd = quotemeta "/".dirname($file);	# directory part of the include name
       $ok=2 if not $dir =~ /$fd$/ }		# is speculative
@@ -430,7 +441,7 @@ our sub addfile {
     $how = "missing" }
 
   # verbose/list
-  if   ($ok==1) { report $CK_,beautify($path) }	# double include
+  if   ($ok==1) { report $CK_,beautify($path) }	# redundant, double include
   elsif($ok==2) { report $CM_,beautify($path) }	# speculative
   elsif($ok==3) { report $CC_,beautify($path) }	# OK
   else          { report $CR_,$file }		# not found
@@ -443,12 +454,12 @@ our sub addfile {
   push @INCLUDED,$path;				# register file
   $rdir = dirname $path if $ok;	# save for the explicit path lookup in next recursion
 
-  # filename regexes
+  # important: filename regexes
   my $IN1 = qr/^\h*\"([^\"]+)\"/;		# quoted include
   my $IN2;					# unquoted include
-     $IN2 = qr/^\h*([a-zA-Z0-9\._-]+\.pl)/ if $MODE eq "pl";
-     $IN2 = qr/^\h*([a-zA-Z0-9\._-]+\.py)/ if $MODE eq "py";
-     $IN2 = qr/^\h*([a-zA-Z0-9\._-]+\.h)/  if $MODE eq "c";
+     $IN2 = qr/^\h*([\/a-zA-Z0-9\._-]+\.pl)/ if $MODE eq "pl";
+     $IN2 = qr/^\h*([\/a-zA-Z0-9\._-]+\.py)/ if $MODE eq "py";
+     $IN2 = qr/^\h*([\/a-zA-Z0-9\._-]+\.h)/  if $MODE eq "c";
 
   my @output; # the output line-by-line
 

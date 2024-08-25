@@ -1,7 +1,7 @@
 PACKAGE	:= pcpp
-VERSION	:= 0.9
+VERSION	:= 0.10
 AUTHOR	:= R.Jaksa 2008,2024 GPLv3
-SUBVERSION := a
+SUBVERSION := 
 
 SHELL	:= /bin/bash
 PATH	:= usr/bin:$(PATH)

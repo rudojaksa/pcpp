@@ -134,22 +134,27 @@ The language is autodetected according to the suffix of the input file: `.pl`,
 Include paths can be specified as a filename only `# include abc.pl` or
 specifying also a part of the path `# include xy/abc.pl` or `# include
 yz/abc.pl` to distinguish between equal filenames in different directories.
-The resolving algorithm is:
 
-1. trying direct path from the current working directory,
-2. trying the path from the directory of the file from which the include is called,
-3. try to find files recursively in any subdirectory of the current working directory (in the depth order),
-4. strip the directory part from the included file name, and try to find it just by the filename.
+The path resolving algorithm distinguishes between files included from the
+top-level source or from a file which is included.  Path resolving algorithm
+considers paths relative to the current working directory (CWD) or to the
+directory of the currently parsed file.  The algorithm is:
 
-In the case of conflict, i.e. `# include "abc.pl"` where two `abc.pl` are
+1. try direct path for the top-level file includes (CWD relative),
+2. try path relative to currently active included file (to allow incorporation of whole code trees with relative includes working),
+3. try CWD-relative paths even for not-top-level files (to allow programmer to think about files as relative from CWD),
+4. try to find files recursively in any subdirectory of the CWD in the depth order (to allow to skip dirnames for unique filenames),
+5. strip the directory part from the included file name, and try to find it just by the filename (just a plan-B for wrong dirnames when moving files).
+
+In the case of conflict, i.e. `# include "abc.pl"` where two `abc.pl` files are
 available, the first one is chosen: `./abc.pl` is the direct path so it has a
 higher priority than the `xy/abc.pl`.
 
-Double includes are avoided, so the file from the given path is copy-pasted to
-the output only once, on the place of the first appearance of the include
-statement.
+Double includes are automatically avoided by the `pcpp`.  Any included file is
+copy-pasted to the output only once, on the place of the first appearance of
+its include statement.
 
-Missing include files are by default silently ignored, or reported in the
+Missing include files are silently ignored (by default), or reported in the
 verbose mode (-v switch).
 
 ### Triple comments
@@ -274,6 +279,19 @@ Example Makefile:
 -include .abc.d
 ```
 
+Next table lists `pcpp` reporting options, and which files they report.  Direct
+files are these loaded according to the command-line request, not by the
+include directive.  Missing files are those not found, by requested by the
+include directive.
+
+```
+          | where  | direct | found | missing | redundant
+----------------------------------------------------------
+  -v/vv/l | stderr |  yes   |  yes  |  yes X    |   yes
+-ln/l1/lp | stdout |   no   |  yes  |  no   X  |   no
+   -d/-dd | stdout |  yes   |  yes  |  yes X   |   no X
+```
+
 ### See also
 
 &nbsp;&nbsp; [pcpp -h](pcpp.md)  
@@ -284,7 +302,7 @@ Example Makefile:
 Files `pcpp` and `uninclude` are standalone Perl scripts, which can be copied
 to any `/bin` directory for a system-wide installation.
 
-### Under the hood
+### Example
 
 The pcpp itself is processed by the pcpp, so its source code is an example of
 how to use the pcpp.

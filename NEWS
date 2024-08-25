@@ -1,3 +1,7 @@
+0.10  - better verbose messages
+      - added relative CWD paths for all levels to resolve algorithm
+      - fixed broken subdir paths include parser
+      - verbose "load" instead of "include" for "direct" files
       - fixed wrong subdirectory of nonexistent dependencies
 0.9   - -d shows nonexistent files too
       - better -l output

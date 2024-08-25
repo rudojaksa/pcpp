@@ -1,1 +1,2 @@
-exclude: *.bkp pcpp uninclude
+exclude: *.bkp .* pcpp uninclude
+skipdir: usr

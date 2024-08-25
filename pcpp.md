@@ -12,14 +12,15 @@ Simple Perl/Python/C/C++ preprocessor for in-comment directives.
 ### OPTIONS
         -h  This help.
         -v  Verbose, -vv for more verbose.
-        -l  List all files to be used, without producing actual output.
-       -ln  Plain list of files to be included, -l1/lp for level1 or paths.
-    -d TGT  Generate dependencies list for Makefile for the TGT target.
-       -dd  Print a list of dependencies (input file plus included ones).
     -e DIR  Exclude directory from a search, multiple -e possible.
        -nt  No triple comments removal.
        -nw  No watermarking of included parts (by #included).
        -ni  No indentation propagation.
+   
+        -l  List all files to be used, without producing actual output.
+       -ln  Plain list of files to be included, -l1/lp for level1 or paths.
+    -d TGT  Generate dependencies list for Makefile for the TGT target.
+       -dd  Print a list of dependencies (input file plus included ones).
 
 ### INCLUDE DIRECTIVE
        Only lines with the "include" directive are recognized.
@@ -29,10 +30,11 @@ Simple Perl/Python/C/C++ preprocessor for in-comment directives.
        Include files can be defined by the filename, by the path, or by
        a partial incomplete path.  The path resolving procedure is:
    
-       1. look for direct path from CWD,
+       1. look for direct path from CWD if in top-level file,
        2. look for relative path from file to which we include,
-       3. find filename recursively in the depth order from CWD,
-       4. strip directory part from include and serch by filename.
+       3. look for CWD-relative path,
+       4. find filename recursively in the depth order from CWD,
+       5. strip directory part from include and serch by filename.
        
        Double includes are avoided.  Missing includes are ignored.
        Any text after include files is a comment.
@@ -58,5 +60,5 @@ Simple Perl/Python/C/C++ preprocessor for in-comment directives.
        pcpp -d pcpp pcpp.pl > .pcpp.d
 
 ### VERSION
-pcpp-0.9a R.Jaksa 2008,2024 GPLv3 built 2024-08-02
+pcpp-0.10 R.Jaksa 2008,2024 GPLv3 built 2024-08-13
 
