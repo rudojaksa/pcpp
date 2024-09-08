@@ -1,3 +1,4 @@
+0.11  - reorganized usr
 0.10  - better verbose messages
       - added relative CWD paths for all levels to resolve algorithm
       - fixed broken subdir paths include parser

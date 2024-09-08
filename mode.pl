@@ -1,4 +1,5 @@
-# include sx.pl
+# include path.pl
+
 {
 
 # return the file mode by the suffix of filename: pl, py or c

@@ -25,7 +25,7 @@ VERSION
 EOF
 
 # ------------------------------------------------------------------------------------- ARGV
-# include colors.pl inar.pl print.pl helpman.pl mode.pl
+# include color.pl array.pl print.pl printhelp.pl mode.pl
 # TODO: uninclude only specified file
 
 for(@ARGV) { if($_ eq "-h")  { printhelp $HELP; exit 0 }}

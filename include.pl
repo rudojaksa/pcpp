@@ -1,3 +1,5 @@
+# include path.pl
+
 { # ------------------------------------ RESOLVE INCLUDE DIRECTIVES AND ASSEMBLE FULL OUTPUT
 
 # verbose printout of includes, globals: $L1, $L2, $level, $how
@@ -27,6 +29,8 @@ my sub report {
     elsif($LIST==4) { print "$sp$file\n" }}}
 
 # ------------------------------------------------------------------------------------- MAIN
+our %INCLUDED; # list of already included files (to disable double include) value=level
+# TODO: actually, double include can be useful when including inside blocks!
 
 # line by line add a file to the output, parse #include directives
 our sub addfile {
@@ -40,26 +44,24 @@ our sub addfile {
 
   $level=0 if not defined $level;		# start level zero
   $indent="" if not defined $indent;
+  # eprint "$level -> $file ("; eprint "$INCLUDED{$_}:$_ " for keys %INCLUDED; eprint ")\n";
 
-  # look for file in CWD using direct path if no recursion yet
+  # look for file in CWD using direct explicit path if no recursion yet
   if(not $level) {
-    $path = $file;				# try direct explicit path
-    if(inar \@INCLUDED,$path) { $ok=1 }		# skip already included
-    elsif(-f $path) { $ok=3 }
+    $path = $file;
+    if(defined $INCLUDED{$path}) { $ok=1 } elsif(-f $path) { $ok=3 }
     $how = "direct" if $ok }
 
   # look for file using explicit path relative to the parent-file dir
-  if(not $ok) {
-    $path = "$rdir/$file";			# try path relative to parent
-    if(inar \@INCLUDED,$path) { $ok=1 }		# already included
-    elsif(-f $path) { $ok=3 }
+  if(not $ok) { # not yet found
+    $path = "$rdir/$file";
+    if(defined $INCLUDED{$path}) { $ok=1 } elsif(-f $path) { $ok=3 }
     $how = "from $rdir" if $ok }
 
-  # look for file using explicit path relative to current working directory (in recursion)
+  # look for file using explicit path relative to CWD (inside recursion)
   if(not $ok) {
-    $path = "$file";				# try path relative to CWD
-    if(inar \@INCLUDED,$path) { $ok=1 }		# already included
-    elsif(-f $path) { $ok=3 }
+    $path = $file;
+    if(defined $INCLUDED{$path}) { $ok=1 } elsif(-f $path) { $ok=3 }
     $how = "from cwd" if $ok }
 
   # look for file recursively (by filename)
@@ -68,7 +70,7 @@ our sub addfile {
     my $dir; for(@DIRS) {			# loop through dirs
       $dir = $_;
       $path = "$dir/$fn";			# try path relative to every dir
-      $ok=1 and last if inar \@INCLUDED,$path;	# already included
+      $ok=1 and last if defined $INCLUDED{$path}; # already included
       $ok=3 and last if inar $FF{$dir},$fn }	# found => proceed
     $how = "found" if $ok;
 
@@ -94,7 +96,7 @@ our sub addfile {
 
   return if $ok==0;				# file not found
   return if $ok==1; # file already included (TODO: accept if requested, but avoid recursion)
-  push @INCLUDED,$path;				# register file
+  $INCLUDED{$path} = $level;				# register file
   $rdir = dirname $path if $ok;	# save for the explicit path lookup in next recursion
 
   # important: filename regexes

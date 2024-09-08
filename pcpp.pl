@@ -69,7 +69,7 @@ VERSION
 EOF
 
 # ------------------------------------------------------------------------------------- ARGV
-# include verbose.pl colors.pl inar.pl print.pl helpman.pl dirname.pl beautify.pl
+# include verbose.pl color.pl array.pl path.pl print.pl printhelp.pl
 
 for(@ARGV) { if($_ eq "-h")  { printhelp $HELP; exit 0 }}
 for(@ARGV) { if($_ eq "-v")  { $VERBOSE=1; $_=""; last }}
@@ -125,9 +125,6 @@ if($VERBOSE>1) {
     eprint "\n" }}
 
 # ------------------------------------------------------------------------- PROCESS INCLUDES
-our @INCLUDED; # list of already included files (to disable double include)
-# TODO: actually, double include can be useful when including inside blocks!
-
 # include include.pl
 
 # auxiliary output buffer, as the include recursion would break simple print to stdout,

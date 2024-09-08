@@ -60,5 +60,5 @@ Simple Perl/Python/C/C++ preprocessor for in-comment directives.
        pcpp -d pcpp pcpp.pl > .pcpp.d
 
 ### VERSION
-pcpp-0.10 R.Jaksa 2008,2024 GPLv3 built 2024-08-13
+pcpp-0.11 R.Jaksa 2008,2024 GPLv3 built 2024-08-29
 
